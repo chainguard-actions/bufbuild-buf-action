@@ -1,7 +1,0 @@
-{
-  "owner": "bufbuild",
-  "name": "buf-action",
-  "visibility": "internal",
-  "description": "Build, format, lint, and check for breaking changes in your Protobuf schemas, and automatically publish to the Buf Schema Registry.",
-  "block_publish": false
-}
