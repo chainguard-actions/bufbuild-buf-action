@@ -1,6 +1,6 @@
 # bufbuild/buf-action
 
-Build, format, lint, and check for breaking changes in your Protobuf schemas, and automatically publish to the Buf Schema Registry.
+Run build, lint, format, and breaking change checks on Protobuf files, and publish schemas to the Buf Schema Registry.
 
 Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/bufbuild/buf-action](https://github.com/bufbuild/buf-action).
 
