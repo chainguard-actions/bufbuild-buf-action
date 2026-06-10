@@ -48373,7 +48373,6 @@ async function installBuf(github, githubToken, inputVersion) {
         const downloadPath = await downloadBuf(resolvedVersion, githubToken);
         await external_fs_.promises.chmod(downloadPath, 0o755);
         cachePath = await tool_cache.cacheFile(downloadPath, binName, bufName, resolvedVersion);
-        await external_fs_.promises.chmod(require('path').join(cachePath, binName), 0o755);
     }
     core.addPath(cachePath);
     core.info(`Setup buf (${resolvedVersion}) at ${cachePath}`);

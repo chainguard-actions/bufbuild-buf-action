@@ -1,0 +1,15 @@
+# This workflow syncs the changes to the BSR without running any checks.
+name: Buf CI
+on:
+  push:
+  delete:
+permissions:
+  contents: read
+jobs:
+  buf:      
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}

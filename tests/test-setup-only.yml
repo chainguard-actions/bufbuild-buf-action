@@ -1,0 +1,44 @@
+name: Test setup-only mode
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "1.50.1"
+          checksum: ""
+          token: "fake-token"
+          public_github_token: "fake-public-token"
+          setup_only: "true"
+          lint: "false"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          archive: "false"
+      - name: Assert buf_version output is set
+        env:
+          BUF_VERSION: ${{ steps.action.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version output is empty"
+            exit 1
+          fi
+          echo "PASS"
+      - name: Assert buf_path output is set
+        env:
+          BUF_PATH: ${{ steps.action.outputs.buf_path }}
+        run: |
+          echo "buf_path: $BUF_PATH"
+          if [ -z "$BUF_PATH" ]; then
+            echo "FAIL: buf_path output is empty"
+            exit 1
+          fi
+          echo "PASS"
