@@ -1,0 +1,59 @@
+name: Test push_create_visibility input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up node24 and buf
+        run: |
+          # Create a node24 wrapper pointing to the available node binary
+          node --version
+          mkdir -p "$HOME/.local/bin"
+          printf '#!/bin/sh\nexec node "$@"\n' > "$HOME/.local/bin/node24"
+          chmod +x "$HOME/.local/bin/node24"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          # Also create symlink in /usr/local/bin for act's own PATH lookup
+          sudo ln -sf "$(which node)" /usr/local/bin/node24 2>/dev/null || true
+          # Pre-install buf 1.50.1 so the action finds it on PATH and skips download
+          curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.50.1/buf-Linux-x86_64" -o /usr/local/bin/buf
+          chmod +x /usr/local/bin/buf
+          buf --version
+
+      - id: action
+        uses: .
+        with:
+          setup_only: "true"
+          version: "1.50.1"
+          # push_create_visibility controls visibility when creating a new BSR repo
+          push_create_visibility: "public"
+          lint: "false"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          archive: "false"
+          pr_comment: "false"
+
+      - name: Assert buf_version output is set
+        env:
+          BUF_VERSION: ${{ steps.action.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version output is empty"
+            exit 1
+          fi
+          echo "PASS: buf_version=$BUF_VERSION"
+
+      - name: Assert buf_path output is set
+        env:
+          BUF_PATH: ${{ steps.action.outputs.buf_path }}
+        run: |
+          echo "buf_path: $BUF_PATH"
+          if [ -z "$BUF_PATH" ]; then
+            echo "FAIL: buf_path output is empty"
+            exit 1
+          fi
+          echo "PASS: buf binary path=$BUF_PATH"

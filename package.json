@@ -1,0 +1,53 @@
+{
+  "name": "buf-action",
+  "version": "1.5.0",
+  "description": "GitHub Action for buf",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write 'src/*.{json,js,jsx,ts,tsx,css}' --log-level error",
+    "lint": "eslint --max-warnings 0 src",
+    "lint:fix": "eslint --max-warnings 0 --fix src",
+    "build": "ncc build -o dist src/main.ts && ncc build -o dist/post src/post.ts",
+    "generate": "license-header --ignore 'dist/**'"
+  },
+  "keywords": [
+    "actions",
+    "buf",
+    "proto",
+    "protobuf"
+  ],
+  "author": "Buf Technologies, Inc.",
+  "license": "Apache-2.0",
+  "licenseHeader": {
+    "licenseType": "apache",
+    "yearRange": "2024-2025",
+    "copyrightHolder": "Buf Technologies, Inc."
+  },
+  "devDependencies": {
+    "@bufbuild/license-header": "^0.0.4",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.3.0",
+    "@types/semver": "^7.7.0",
+    "@vercel/ncc": "^0.44.1",
+    "eslint": "^10.0.3",
+    "globals": "^17.7.0",
+    "prettier": "3.8.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.33.0"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/exec": "^3.0.0",
+    "@actions/github": "^9.0.0",
+    "@actions/io": "^3.0.2",
+    "@actions/tool-cache": "^4.0.0",
+    "@buf/bufbuild_registry.bufbuild_es": "^2.2.3-20250116203702-1c024d64352b.1",
+    "@bufbuild/protobuf": "^2.2.5",
+    "@connectrpc/connect": "^2.0.1",
+    "@connectrpc/connect-web": "^2.0.1",
+    "@octokit/webhooks-types": "^7.6.1",
+    "parse-diff": "^0.12.0",
+    "semver": "^7.7.2"
+  }
+}

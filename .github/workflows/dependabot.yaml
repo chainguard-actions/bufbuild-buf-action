@@ -1,0 +1,27 @@
+name: Dependabot Rebuild
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  build:
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: rebuild
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          make build
+          git add -A
+          git commit -m "[dependabot skip] build" || true
+          git push -u origin "HEAD:${HEAD_REF}"
