@@ -1,4 +1,4 @@
-name: Test buf-action setup only
+name: Test buf-action with public_github_token input
 on:
   workflow_dispatch:
 jobs:
@@ -10,6 +10,7 @@ jobs:
         uses: .
         with:
           setup_only: "true"
+          public_github_token: ${{ github.token }}
       - name: Assert buf_version output is set
         env:
           BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
@@ -19,7 +20,7 @@ jobs:
             echo "FAIL: buf_version output is empty"
             exit 1
           fi
-          echo "PASS: buf_version=$BUF_VERSION"
+          echo "PASS: setup with public_github_token completed, buf_version=$BUF_VERSION"
       - name: Assert buf_path output is set
         env:
           BUF_PATH: ${{ steps.buf.outputs.buf_path }}
@@ -30,10 +31,3 @@ jobs:
             exit 1
           fi
           echo "PASS: buf_path=$BUF_PATH"
-      - name: Assert buf is on PATH and works
-        run: |
-          if ! buf --version; then
-            echo "FAIL: buf is not on PATH or failed to run"
-            exit 1
-          fi
-          echo "PASS: buf is on PATH"

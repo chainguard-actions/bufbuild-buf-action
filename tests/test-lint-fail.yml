@@ -1,0 +1,40 @@
+name: Test buf-action lint fails on invalid proto
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create proto with lint violations
+        run: |
+          mkdir -p /tmp/bad-proto/foo/v1
+          printf 'version: v2\nlint:\n  use:\n    - STANDARD\n' > /tmp/bad-proto/buf.yaml
+          printf 'syntax = "proto3";\npackage foo.v1;\nmessage badMessage {\n  string BadField = 1;\n}\n' > /tmp/bad-proto/foo/v1/bad.proto
+      - id: buf
+        uses: .
+        continue-on-error: true
+        with:
+          setup_only: "false"
+          lint: "true"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          archive: "false"
+          input: "/tmp/bad-proto"
+      - name: Assert lint step failed on bad proto
+        env:
+          OUTCOME: ${{ steps.buf.outcome }}
+          BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "buf_version: $BUF_VERSION"
+          if [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: lint correctly failed on invalid proto"
+          elif [ "$OUTCOME" = "success" ]; then
+            echo "FAIL: lint should have failed on invalid proto but succeeded"
+            exit 1
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

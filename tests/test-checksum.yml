@@ -1,0 +1,45 @@
+name: Test buf-action with checksum verification
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      # Step 1: Install buf with a specific version to get the binary path
+      - id: buf_install
+        uses: .
+        with:
+          setup_only: "true"
+          version: "1.50.1"
+      # Step 2: Compute the sha256 checksum of the installed binary
+      - name: Compute checksum
+        id: compute_checksum
+        env:
+          BUF_PATH: ${{ steps.buf_install.outputs.buf_path }}
+        run: |
+          echo "buf_path: $BUF_PATH"
+          CHECKSUM=$(sha256sum "$BUF_PATH" | awk '{print $1}')
+          echo "computed checksum: $CHECKSUM"
+          echo "checksum=$CHECKSUM" >> "$GITHUB_OUTPUT"
+      # Step 3: Run the action again with the computed checksum to verify the input is accepted
+      - id: buf_with_checksum
+        uses: .
+        with:
+          setup_only: "true"
+          version: "1.50.1"
+          checksum: ${{ steps.compute_checksum.outputs.checksum }}
+      - name: Assert buf_version output is set
+        env:
+          BUF_VERSION: ${{ steps.buf_with_checksum.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version output is empty"
+            exit 1
+          fi
+          if [ "$BUF_VERSION" != "1.50.1" ]; then
+            echo "FAIL: expected version 1.50.1 but got $BUF_VERSION"
+            exit 1
+          fi
+          echo "PASS: checksum verification succeeded, buf_version=$BUF_VERSION"

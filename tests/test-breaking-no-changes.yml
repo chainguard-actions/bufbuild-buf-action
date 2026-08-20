@@ -1,0 +1,31 @@
+name: Test buf-action breaking change detection with no changes
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - id: buf
+        uses: .
+        with:
+          setup_only: "false"
+          lint: "false"
+          format: "false"
+          breaking: "true"
+          push: "false"
+          archive: "false"
+          input: "${{ github.workspace }}/tests/fixtures/proto"
+          breaking_against: "${{ github.workspace }}/tests/fixtures/proto"
+      - name: Assert buf_version output is set
+        env:
+          BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version output is empty"
+            exit 1
+          fi
+          echo "PASS: breaking check completed with no changes, buf_version=$BUF_VERSION"

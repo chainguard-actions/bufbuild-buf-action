@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package acme.v1;
+
+// HelloService is a simple greeting service.
+service HelloService {
+  // SayHello sends a greeting.
+  rpc SayHello(SayHelloRequest) returns (SayHelloResponse) {}
+}
+
+// SayHelloRequest is the request message for SayHello.
+message SayHelloRequest {
+  // name is the name to greet.
+  string name = 1;
+}
+
+// SayHelloResponse is the response message for SayHello.
+message SayHelloResponse {
+  // message is the greeting message.
+  string message = 1;
+}

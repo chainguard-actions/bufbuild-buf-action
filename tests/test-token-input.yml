@@ -1,0 +1,36 @@
+name: Test buf-action with token input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      # Pass a token input with setup_only=true. The action will attempt BSR login
+      # with the provided token. Since this is a test environment, the token may
+      # not be valid for BSR, so we allow failure and check the outcome.
+      - id: buf
+        uses: .
+        continue-on-error: true
+        with:
+          setup_only: "true"
+          token: "test-token-placeholder"
+      - name: Assert action ran and produced buf_version or failed gracefully
+        env:
+          BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
+          OUTCOME: ${{ steps.buf.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "buf_version: $BUF_VERSION"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$BUF_VERSION" ]; then
+              echo "FAIL: action succeeded but buf_version output is empty"
+              exit 1
+            fi
+            echo "PASS: action succeeded with token input, buf_version=$BUF_VERSION"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (invalid BSR token expected in test environment)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

@@ -1,0 +1,36 @@
+name: Test buf-action setup with specific version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: buf
+        uses: .
+        with:
+          setup_only: "true"
+          version: "1.50.1"
+      - name: Assert buf_version matches requested version
+        env:
+          BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version output is empty"
+            exit 1
+          fi
+          if [ "$BUF_VERSION" != "1.50.1" ]; then
+            echo "FAIL: expected version 1.50.1 but got $BUF_VERSION"
+            exit 1
+          fi
+          echo "PASS: buf_version=$BUF_VERSION"
+      - name: Assert buf binary reports correct version
+        run: |
+          ACTUAL_VERSION=$(buf --version 2>&1)
+          echo "buf --version output: $ACTUAL_VERSION"
+          if [ "$ACTUAL_VERSION" != "1.50.1" ]; then
+            echo "FAIL: expected buf version 1.50.1 but got $ACTUAL_VERSION"
+            exit 1
+          fi
+          echo "PASS: buf version matches"
