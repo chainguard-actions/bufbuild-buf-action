@@ -1,0 +1,33 @@
+name: Test buf-action setup with public_github_token
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: buf
+        uses: .
+        with:
+          setup_only: "true"
+          public_github_token: ${{ github.token }}
+      - name: Assert buf_version output is set
+        env:
+          BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version output is empty"
+            exit 1
+          fi
+          echo "PASS: setup with public_github_token completed, buf_version=$BUF_VERSION"
+      - name: Assert buf_path output is set
+        env:
+          BUF_PATH: ${{ steps.buf.outputs.buf_path }}
+        run: |
+          echo "buf_path: $BUF_PATH"
+          if [ -z "$BUF_PATH" ]; then
+            echo "FAIL: buf_path output is empty"
+            exit 1
+          fi
+          echo "PASS: buf_path=$BUF_PATH"

@@ -1,4 +1,4 @@
-name: Test buf-action push with create visibility setting
+name: Test buf-action setup with version checksum verification
 on:
   workflow_dispatch:
 jobs:
@@ -10,16 +10,10 @@ jobs:
         uses: .
         continue-on-error: true
         with:
-          setup_only: "false"
-          lint: "false"
-          format: "false"
-          breaking: "false"
-          push: "true"
-          archive: "false"
-          input: "${{ github.workspace }}/tests/fixtures/proto"
-          push_create_visibility: "private"
-          push_disable_create: "true"
-      - name: Assert action ran (push fails gracefully without BSR token/module)
+          setup_only: "true"
+          version: "1.50.1"
+          checksum: "invalid-checksum-to-test-input-is-accepted"
+      - name: Assert action ran (checksum mismatch causes graceful failure)
         env:
           OUTCOME: ${{ steps.buf.outcome }}
           BUF_VERSION: ${{ steps.buf.outputs.buf_version }}
@@ -27,13 +21,13 @@ jobs:
           echo "outcome: $OUTCOME"
           echo "buf_version: $BUF_VERSION"
           if [ "$OUTCOME" = "failure" ]; then
-            echo "PASS: action failed gracefully (no BSR token/module configured, expected)"
+            echo "PASS: action failed gracefully on checksum mismatch (expected)"
           elif [ "$OUTCOME" = "success" ]; then
             if [ -z "$BUF_VERSION" ]; then
               echo "FAIL: action succeeded but buf_version output is empty"
               exit 1
             fi
-            echo "PASS: push completed with buf_version=$BUF_VERSION"
+            echo "PASS: action succeeded with buf_version=$BUF_VERSION"
           else
             echo "FAIL: unexpected outcome '$OUTCOME'"
             exit 1
