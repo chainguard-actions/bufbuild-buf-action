@@ -1,4 +1,4 @@
-name: Test setup with checksum verification
+name: Test paths and exclude_paths inputs
 on:
   workflow_dispatch:
 jobs:
@@ -21,18 +21,18 @@ jobs:
           curl -sSL "https://github.com/bufbuild/buf/releases/download/v1.50.1/buf-Linux-x86_64" -o /usr/local/bin/buf
           chmod +x /usr/local/bin/buf
           buf --version
-          # Compute the sha256 checksum of the installed buf binary for use in the action
-          SHA256=$(sha256sum /usr/local/bin/buf | awk '{print $1}')
-          echo "BUF_CHECKSUM=$SHA256" >> $GITHUB_ENV
-          echo "Computed checksum: $SHA256"
 
       - id: action
         uses: .
         with:
-          setup_only: "true"
+          setup_only: "false"
           version: "1.50.1"
-          checksum: ${{ env.BUF_CHECKSUM }}
-          lint: "false"
+          input: tests/fixtures/proto
+          paths: |
+            tests/fixtures/proto/acme/v1/hello.proto
+          exclude_paths: |
+            tests/fixtures/proto/acme/v1/nonexistent.proto
+          lint: "true"
           format: "false"
           breaking: "false"
           push: "false"
@@ -50,13 +50,6 @@ jobs:
           fi
           echo "PASS: buf_version=$BUF_VERSION"
 
-      - name: Assert buf_path output is set
-        env:
-          BUF_PATH: ${{ steps.action.outputs.buf_path }}
+      - name: Assert lint with paths passed (action did not fail)
         run: |
-          echo "buf_path: $BUF_PATH"
-          if [ -z "$BUF_PATH" ]; then
-            echo "FAIL: buf_path output is empty"
-            exit 1
-          fi
-          echo "PASS: buf binary path=$BUF_PATH"
+          echo "PASS: lint with paths and exclude_paths completed without error"

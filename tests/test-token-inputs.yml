@@ -1,4 +1,4 @@
-name: Test token and public_github_token inputs
+name: Test token and push_create_visibility inputs
 on:
   workflow_dispatch:
 jobs:
@@ -22,15 +22,18 @@ jobs:
           chmod +x /usr/local/bin/buf
           buf --version
 
+      # Use setup_only so the action initializes with the token/push inputs
+      # without actually attempting a BSR push (which would fail without real BSR credentials).
+      # The token, public_github_token, and push_create_visibility inputs are passed
+      # to exercise the input-reading code paths.
       - id: action
         uses: .
         with:
           setup_only: "true"
           version: "1.50.1"
-          # token is the BSR API token; use a placeholder (no actual BSR login attempted in setup_only)
-          token: "placeholder-bsr-token"
-          # public_github_token is used to resolve buf versions from github.com
+          token: "dummy-bsr-token"
           public_github_token: ${{ github.token }}
+          push_create_visibility: "private"
           lint: "false"
           format: "false"
           breaking: "false"

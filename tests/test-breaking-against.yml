@@ -33,7 +33,7 @@ jobs:
           lint: "false"
           format: "false"
           breaking: "true"
-          breaking_against: ".git#branch=act-harness,subdir=tests/fixtures/proto"
+          breaking_against: ".git#branch=act-harness,subdir=hardened/tests/fixtures/proto"
           push: "false"
           archive: "false"
           pr_comment: "false"
@@ -49,6 +49,6 @@ jobs:
           fi
           echo "PASS: buf_version=$BUF_VERSION"
 
-      - name: Assert breaking check passed (no breaking changes against same ref)
+      - name: Assert breaking check with breaking_against passed
         run: |
-          echo "PASS: breaking change detection completed without error (no changes expected)"
+          echo "PASS: breaking change detection with breaking_against completed without error"
