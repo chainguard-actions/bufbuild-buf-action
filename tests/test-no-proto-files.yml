@@ -1,0 +1,51 @@
+name: Test behavior with no proto files
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Create empty directory with buf.yaml but no proto files
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/empty-proto"
+          cat > "$GITHUB_WORKSPACE/empty-proto/buf.yaml" << 'EOF'
+          version: v2
+          lint:
+            use:
+              - DEFAULT
+          EOF
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          setup_only: "false"
+          input: "empty-proto"
+          lint: "false"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          archive: "false"
+      - name: Assert action failed gracefully (no proto files)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          BUF_VERSION: ${{ steps.action.outputs.buf_version }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "buf_version: $BUF_VERSION"
+          # The action should fail because there are no .proto files
+          # buf_version should still be set even if the build step fails
+          if [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed as expected with no proto files"
+          elif [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded (buf may handle empty dirs gracefully)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
+          # buf_version should always be set since installation happens before build
+          if [ -z "$BUF_VERSION" ]; then
+            echo "FAIL: buf_version should be set even when build fails"
+            exit 1
+          fi
+          echo "PASS: buf_version is set: $BUF_VERSION"

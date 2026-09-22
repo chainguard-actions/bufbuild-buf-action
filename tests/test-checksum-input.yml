@@ -1,0 +1,37 @@
+name: Test setup with checksum input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Get buf 1.47.2 checksum for Linux x86_64
+        id: get_checksum
+        run: |
+          # Download the checksums file for buf 1.47.2 and extract the Linux x86_64 checksum
+          CHECKSUM=$(curl -sfL "https://github.com/bufbuild/buf/releases/download/v1.47.2/sha256.txt" \
+            | grep "buf-Linux-x86_64$" | awk '{print $1}')
+          echo "checksum=$CHECKSUM" >> "$GITHUB_OUTPUT"
+          echo "Resolved checksum: $CHECKSUM"
+      - id: action
+        uses: .
+        with:
+          version: "1.47.2"
+          checksum: ${{ steps.get_checksum.outputs.checksum }}
+          setup_only: "true"
+          lint: "false"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          archive: "false"
+      - name: Assert buf_version matches requested version
+        env:
+          BUF_VERSION: ${{ steps.action.outputs.buf_version }}
+        run: |
+          echo "buf_version: $BUF_VERSION"
+          if [ "$BUF_VERSION" != "1.47.2" ]; then
+            echo "FAIL: expected buf_version '1.47.2', got '$BUF_VERSION'"
+            exit 1
+          fi
+          echo "PASS: buf_version matches and checksum was accepted"
