@@ -6,11 +6,11 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 ## Versions
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v1.4.0 | [`v1.4.0`](https://github.com/chainguard-actions/bufbuild-buf-action/tree/v1.4.0) | [`fd21066`](https://github.com/bufbuild/buf-action/commit/fd21066df7214747548607aaa45548ba2b9bc1ff) |
-| v1.5.0 | [`v1.5.0`](https://github.com/chainguard-actions/bufbuild-buf-action/tree/v1.5.0) | [`8c6a16e`](https://github.com/bufbuild/buf-action/commit/8c6a16e16f12ba20b6470afa9c2ba9b5ba8c97c3) |
-| v1.6.0 | [`v1.6.0`](https://github.com/chainguard-actions/bufbuild-buf-action/tree/v1.6.0) | [`85aebf7`](https://github.com/bufbuild/buf-action/commit/85aebf73123b5c15fd5528aaecbf9129cddf7fa7) |
+| Version | Tag | Upstream commit | Hardening report |
+|---------|-----|-----------------|------------------|
+| v1.4.0 | [`v1.4.0`](https://github.com/chainguard-actions/bufbuild-buf-action/tree/v1.4.0) | [`fd21066`](https://github.com/bufbuild/buf-action/commit/fd21066df7214747548607aaa45548ba2b9bc1ff) | [`HARDENING.md`](https://github.com/chainguard-actions/bufbuild-buf-action/blob/v1.4.0/HARDENING.md) |
+| v1.5.0 | [`v1.5.0`](https://github.com/chainguard-actions/bufbuild-buf-action/tree/v1.5.0) | [`8c6a16e`](https://github.com/bufbuild/buf-action/commit/8c6a16e16f12ba20b6470afa9c2ba9b5ba8c97c3) | [`HARDENING.md`](https://github.com/chainguard-actions/bufbuild-buf-action/blob/v1.5.0/HARDENING.md) |
+| v1.6.0 | [`v1.6.0`](https://github.com/chainguard-actions/bufbuild-buf-action/tree/v1.6.0) | [`85aebf7`](https://github.com/bufbuild/buf-action/commit/85aebf73123b5c15fd5528aaecbf9129cddf7fa7) | [`HARDENING.md`](https://github.com/chainguard-actions/bufbuild-buf-action/blob/v1.6.0/HARDENING.md) |
 
 ## Privacy
 
