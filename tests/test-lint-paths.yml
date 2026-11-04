@@ -1,0 +1,36 @@
+name: Test lint limited to paths skips violating files
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: 1.50.0
+          input: tests/fixtures/mixed
+          paths: |
+            tests/fixtures/mixed/acme
+          lint: "true"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          pr_comment: "false"
+      - name: Assert success
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          VERSION: ${{ steps.action.outputs.buf_version }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "buf_version: $VERSION"
+          if [ "$OUTCOME" != "success" ]; then
+            echo "FAIL: expected lint to pass when limited to clean paths"
+            exit 1
+          fi
+          if [ "$VERSION" != "1.50.0" ]; then
+            echo "FAIL: expected buf_version 1.50.0"
+            exit 1
+          fi
+          echo "PASS"

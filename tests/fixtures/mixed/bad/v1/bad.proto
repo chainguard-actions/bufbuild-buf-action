@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package bad.v1;
+
+message bad_message {
+  string BadField = 1;
+}

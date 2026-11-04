@@ -1,0 +1,39 @@
+name: Test checksum verification succeeds
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        with:
+          version: 1.50.0
+          setup_only: "true"
+      - id: sum
+        name: Compute checksum of installed buf
+        run: |
+          BIN="$(command -v buf)"
+          echo "buf at: $BIN"
+          SUM="$(sha256sum "$BIN" | awk '{print $1}')"
+          echo "sha256: $SUM"
+          echo "sha=$SUM" >> "$GITHUB_OUTPUT"
+      - id: action
+        uses: .
+        with:
+          version: 1.50.0
+          checksum: ${{ steps.sum.outputs.sha }}
+          setup_only: "true"
+      - name: Assert success
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+          VERSION: ${{ steps.action.outputs.buf_version }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "buf_version: $VERSION"
+          if [ "$OUTCOME" != "success" ] || [ "$VERSION" != "1.50.0" ]; then
+            echo "FAIL: expected success with matching checksum"
+            exit 1
+          fi
+          echo "PASS"

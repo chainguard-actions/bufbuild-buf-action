@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package acme.weather.v1;
+
+// Forecast is a weather forecast.
+message Forecast {
+  string location = 1;
+  int32 temperature = 2;
+}

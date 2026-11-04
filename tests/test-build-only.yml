@@ -1,0 +1,28 @@
+name: Test build only (lint disabled) on module with lint violations
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: 1.50.0
+          input: tests/fixtures/badlint
+          lint: "false"
+          format: "false"
+          breaking: "false"
+          push: "false"
+          pr_comment: "false"
+      - name: Assert success
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "success" ]; then
+            echo "FAIL: expected success when only build runs"
+            exit 1
+          fi
+          echo "PASS"

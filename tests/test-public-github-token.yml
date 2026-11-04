@@ -1,0 +1,30 @@
+name: Test setup with public_github_token resolving latest version
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          setup_only: "true"
+          public_github_token: ${{ github.token }}
+      - name: Assert buf installed
+        env:
+          VERSION: ${{ steps.action.outputs.buf_version }}
+          BUF_PATH: ${{ steps.action.outputs.buf_path }}
+        run: |
+          echo "buf_version: $VERSION"
+          echo "buf_path: $BUF_PATH"
+          if [ -z "$VERSION" ]; then
+            echo "FAIL: buf_version output empty"
+            exit 1
+          fi
+          if [ -z "$BUF_PATH" ] || [ ! -x "$BUF_PATH" ]; then
+            echo "FAIL: buf_path missing or not executable"
+            exit 1
+          fi
+          "$BUF_PATH" --version
+          echo "PASS"
