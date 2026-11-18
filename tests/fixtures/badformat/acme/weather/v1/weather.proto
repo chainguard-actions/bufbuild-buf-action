@@ -1,3 +1,0 @@
-syntax="proto3";
-package acme.weather.v1;
-message Forecast{string location=1;     int32 temperature=2;}

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package foo;
-
-message bad_message {
-  string BadField = 1;
-}
